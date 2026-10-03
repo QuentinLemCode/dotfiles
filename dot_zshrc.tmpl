@@ -1,0 +1,73 @@
+# ~/.zshrc — géré par chezmoi (ne pas éditer directement : `chezmoi edit ~/.zshrc`)
+# Pour profiler le démarrage : décommenter ici et `zprof` à la fin du fichier.
+# zmodload zsh/zprof
+
+{{ if eq .chezmoi.os "darwin" -}}
+# --- Homebrew ---
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+{{ end -}}
+
+# --- PATH ---
+typeset -U path   # pas de doublons
+path=("$HOME/.local/bin" $path)
+
+# --- oh-my-zsh ---
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""                              # le prompt est géré par starship
+zstyle ':omz:update' mode disabled        # mises à jour gérées par chezmoi (.chezmoiexternal.toml)
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting                 # doit rester en DERNIER
+)
+source "$ZSH/oh-my-zsh.sh"
+
+# --- Éditeur / pager ---
+export EDITOR="${EDITOR:-vim}"
+export BAT_THEME="${BAT_THEME:-TwoDark}"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# --- fzf (Ctrl+T : fichiers, Alt+C : dossiers) ---
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh)
+  export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+  export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:200 {}'"
+  export FZF_ALT_C_OPTS="--preview 'lsd --tree --depth 2 --color=always {}'"
+fi
+
+# --- atuin (Ctrl+R) : après fzf pour reprendre la main sur Ctrl+R ---
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+fi
+
+# --- zoxide : `z <dossier>` et `zi` (interactif) ---
+# Pour remplacer carrément `cd` : zoxide init zsh --cmd cd
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
+# --- Alias ---
+if command -v lsd >/dev/null 2>&1; then
+  alias ls='lsd'
+  alias ll='lsd -l'
+  alias la='lsd -la'
+  alias lt='lsd --tree --depth 2'
+fi
+if command -v bat >/dev/null 2>&1; then
+  alias cat='bat --paging=never'
+fi
+alias ..='cd ..'
+alias ...='cd ../..'
+alias cz='chezmoi'
+
+# --- starship (en dernier) ---
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+# --- Surcharges locales à la machine (secrets, tokens, PATH spécifique…) : non versionné ---
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

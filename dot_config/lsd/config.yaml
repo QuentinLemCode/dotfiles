@@ -1,0 +1,20 @@
+classic: false
+blocks:
+  - permission
+  - user
+  - group
+  - size
+  - date
+  - name
+color:
+  when: auto
+date: date
+icons:
+  when: auto
+  theme: fancy
+  separator: " "
+layout: grid
+size: short
+sorting:
+  column: name
+  dir-grouping: first

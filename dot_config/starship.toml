@@ -1,0 +1,24 @@
+# https://starship.rs/config/
+# Astuce : `starship preset nerd-font-symbols -o ~/.config/starship.toml` pour d'autres icônes.
+add_newline = true
+command_timeout = 800
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+
+[cmd_duration]
+min_time = 2000
+format = "took [$duration]($style) "
+
+[git_branch]
+symbol = " "
+
+[git_status]
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
