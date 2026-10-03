@@ -22,12 +22,44 @@ zstyle ':omz:update' mode disabled        # mises à jour gérées par chezmoi (
 plugins=(
   git
   zsh-autosuggestions
+  terraform
+  nvm
   zsh-syntax-highlighting                 # doit rester en DERNIER
 )
+
+export NVM_DIR="$HOME/.nvm"
+zstyle ':omz:plugins:nvm' lazy yes
+zstyle ':omz:plugins:nvm' lazy-cmd nest tsc eslint prettier
+zstyle ':omz:plugins:nvm' autoload yes
+zstyle ':omz:plugins:nvm' silent-autoload yes
 source "$ZSH/oh-my-zsh.sh"
+# --- nvm : charge nvm (lazy) dès qu'un .nvmrc est présent dans le dossier ou un parent ---
+# Le plugin oh-my-zsh active ensuite la bonne version et gère le retour à la version par défaut.
+_nvm_autoload_on_nvmrc() {
+  (( $+functions[_omz_nvm_load] )) || return 0     # nvm déjà chargé (ou absent) : rien à faire
+  local dir="$PWD"
+  while [[ -n "$dir" && "$dir" != "/" ]]; do
+    if [[ -f "$dir/.nvmrc" ]]; then
+      _omz_nvm_load
+      return 0
+    fi
+    dir="${dir:h}"
+  done
+}
+autoload -U add-zsh-hook
+add-zsh-hook chpwd _nvm_autoload_on_nvmrc
+_nvm_autoload_on_nvmrc     # cas d'un terminal ouvert directement dans un projet
+
 
 # --- Éditeur / pager ---
-export EDITOR="${EDITOR:-vim}"
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR="nvim"
+  export VISUAL="nvim"
+  alias vi='nvim'
+  alias vim='nvim'
+else
+  export EDITOR="${EDITOR:-vim}"       # repli tant que neovim n'est pas installé
+fi
 export BAT_THEME="${BAT_THEME:-TwoDark}"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
@@ -71,3 +103,5 @@ fi
 
 # --- Surcharges locales à la machine (secrets, tokens, PATH spécifique…) : non versionné ---
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"

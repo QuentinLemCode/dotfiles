@@ -18,3 +18,10 @@ brew "bat"
 # --- Terminal & police (Nerd Font requise pour les icônes de lsd/starship) ---
 cask "iterm2"
 cask "font-meslo-lg-nerd-font"
+
+cask "antigravity"
+brew "neovim"
+
+# Terraform
+tap "hashicorp/tap"
+brew "hashicorp/tap/terraform", trusted: true
