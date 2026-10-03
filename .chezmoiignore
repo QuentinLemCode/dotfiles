@@ -1,0 +1,5 @@
+# Fichiers du dépôt qui ne doivent PAS être déployés dans $HOME
+README.md
+install.sh
+Brewfile
+LICENSE
