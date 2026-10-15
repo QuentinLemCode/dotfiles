@@ -25,3 +25,7 @@ brew "neovim"
 # Terraform
 tap "hashicorp/tap"
 brew "hashicorp/tap/terraform", trusted: true
+
+# Coding
+cask "visual-studio-code"
+brew "uv"
